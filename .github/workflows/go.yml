@@ -30,7 +30,9 @@ jobs:
         sudo apt-get install -y protobuf-compiler
 
     - name: Install protoc-gen-go 
-      run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+      run: | 
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
     - name: Generate proto contracts
       run: protoc -I proto proto/**/contract.proto --go_out=./gen/ --go_opt=paths=source_relative --go-grpc_out=./gen/ --go-grpc_opt=paths=source_relative
@@ -41,7 +43,6 @@ jobs:
     - name: Commit generated contracts
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: "feat: update generated proto GO contracts [skip ci]"
-        file_pattern: "gen/*"
+        commit_message: "feat: update contracts [skip ci]"
         commit_user_name: "github-actions[bot]"
         commit_user_email: "github-actions[bot]@users.noreply.github.com"
