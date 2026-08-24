@@ -1,0 +1,42 @@
+//go:generate protoc -I proto proto/auth/contract.proto --go_out=./gen/ --go_opt=paths=source_relative --go-grpc_out=./gen/ --go-grpc_opt=paths=source_relative
+
+syntax = "proto3";
+
+package authservice;
+
+option go_package = "github.com/role-play-dev/contracts/auth";
+
+service AuthService {
+    rpc SendLink(SendLinkRequest) returns (SendLinkResponce) {}
+    rpc Register(RegisterRequest) returns (RegisterResponce) {}
+    rpc Login(LoginRequest) returns (LoginResponce) {}
+}
+
+message SendLinkRequest {
+    string email = 1;
+    string client_address = 2;
+}
+
+message SendLinkResponce {
+}
+
+message RegisterRequest {
+    string token = 1;
+    string username = 2;
+    string password = 3;
+}
+
+message RegisterResponce {
+
+}
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginResponce {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
