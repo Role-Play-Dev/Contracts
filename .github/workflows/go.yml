@@ -36,7 +36,7 @@ jobs:
 
     - name: Generate proto contracts
       run: | 
-        mkdir -p /gen
+        sudo mkdir -p /gen
         protoc -I proto proto/**/contract.proto --go_out=./gen/ --go_opt=paths=source_relative --go-grpc_out=./gen/ --go-grpc_opt=paths=source_relative
 
     - name: Add deps
