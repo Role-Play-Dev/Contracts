@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package authservice;
+package authpb;
 
-option go_package = "github.com/role-play-dev/contracts/authservice";
+option go_package = "github.com/role-play-dev/contarcts/authpb";
 
 service AuthService {
     rpc SendLink(SendLinkRequest) returns (SendLinkResponce) {}
