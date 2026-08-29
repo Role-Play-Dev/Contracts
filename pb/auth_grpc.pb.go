@@ -19,18 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_SendLink_FullMethodName = "/authpb.AuthService/SendLink"
-	AuthService_Register_FullMethodName = "/authpb.AuthService/Register"
-	AuthService_Login_FullMethodName    = "/authpb.AuthService/Login"
+	AuthService_CredentialsRegisterLinkSend_FullMethodName    = "/authpb.AuthService/CredentialsRegisterLinkSend"
+	AuthService_CredentialsRegisterLinkConfirm_FullMethodName = "/authpb.AuthService/CredentialsRegisterLinkConfirm"
+	AuthService_CredentialsLogin_FullMethodName               = "/authpb.AuthService/CredentialsLogin"
+	AuthService_TokenRefresh_FullMethodName                   = "/authpb.AuthService/TokenRefresh"
 )
 
 // AuthServiceClient is the client API for AuthService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
-	SendLink(ctx context.Context, in *SendLinkRequest, opts ...grpc.CallOption) (*SendLinkResponce, error)
-	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponce, error)
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponce, error)
+	CredentialsRegisterLinkSend(ctx context.Context, in *CredentialsRegisterLinkSendRequest, opts ...grpc.CallOption) (*CredentialsRegisterLinkSendResponce, error)
+	CredentialsRegisterLinkConfirm(ctx context.Context, in *CredentialsRegisterLinkConfirmRequest, opts ...grpc.CallOption) (*CredentialsRegisterLinkConfirmResponce, error)
+	CredentialsLogin(ctx context.Context, in *CredentialsLoginRequest, opts ...grpc.CallOption) (*CredentialsLoginResponce, error)
+	TokenRefresh(ctx context.Context, in *TokenRefreshRequest, opts ...grpc.CallOption) (*TokenRefreshResponce, error)
 }
 
 type authServiceClient struct {
@@ -41,30 +43,40 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 	return &authServiceClient{cc}
 }
 
-func (c *authServiceClient) SendLink(ctx context.Context, in *SendLinkRequest, opts ...grpc.CallOption) (*SendLinkResponce, error) {
+func (c *authServiceClient) CredentialsRegisterLinkSend(ctx context.Context, in *CredentialsRegisterLinkSendRequest, opts ...grpc.CallOption) (*CredentialsRegisterLinkSendResponce, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SendLinkResponce)
-	err := c.cc.Invoke(ctx, AuthService_SendLink_FullMethodName, in, out, cOpts...)
+	out := new(CredentialsRegisterLinkSendResponce)
+	err := c.cc.Invoke(ctx, AuthService_CredentialsRegisterLinkSend_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponce, error) {
+func (c *authServiceClient) CredentialsRegisterLinkConfirm(ctx context.Context, in *CredentialsRegisterLinkConfirmRequest, opts ...grpc.CallOption) (*CredentialsRegisterLinkConfirmResponce, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RegisterResponce)
-	err := c.cc.Invoke(ctx, AuthService_Register_FullMethodName, in, out, cOpts...)
+	out := new(CredentialsRegisterLinkConfirmResponce)
+	err := c.cc.Invoke(ctx, AuthService_CredentialsRegisterLinkConfirm_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponce, error) {
+func (c *authServiceClient) CredentialsLogin(ctx context.Context, in *CredentialsLoginRequest, opts ...grpc.CallOption) (*CredentialsLoginResponce, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LoginResponce)
-	err := c.cc.Invoke(ctx, AuthService_Login_FullMethodName, in, out, cOpts...)
+	out := new(CredentialsLoginResponce)
+	err := c.cc.Invoke(ctx, AuthService_CredentialsLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) TokenRefresh(ctx context.Context, in *TokenRefreshRequest, opts ...grpc.CallOption) (*TokenRefreshResponce, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TokenRefreshResponce)
+	err := c.cc.Invoke(ctx, AuthService_TokenRefresh_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +87,10 @@ func (c *authServiceClient) Login(ctx context.Context, in *LoginRequest, opts ..
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
 type AuthServiceServer interface {
-	SendLink(context.Context, *SendLinkRequest) (*SendLinkResponce, error)
-	Register(context.Context, *RegisterRequest) (*RegisterResponce, error)
-	Login(context.Context, *LoginRequest) (*LoginResponce, error)
+	CredentialsRegisterLinkSend(context.Context, *CredentialsRegisterLinkSendRequest) (*CredentialsRegisterLinkSendResponce, error)
+	CredentialsRegisterLinkConfirm(context.Context, *CredentialsRegisterLinkConfirmRequest) (*CredentialsRegisterLinkConfirmResponce, error)
+	CredentialsLogin(context.Context, *CredentialsLoginRequest) (*CredentialsLoginResponce, error)
+	TokenRefresh(context.Context, *TokenRefreshRequest) (*TokenRefreshResponce, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -88,14 +101,17 @@ type AuthServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthServiceServer struct{}
 
-func (UnimplementedAuthServiceServer) SendLink(context.Context, *SendLinkRequest) (*SendLinkResponce, error) {
-	return nil, status.Error(codes.Unimplemented, "method SendLink not implemented")
+func (UnimplementedAuthServiceServer) CredentialsRegisterLinkSend(context.Context, *CredentialsRegisterLinkSendRequest) (*CredentialsRegisterLinkSendResponce, error) {
+	return nil, status.Error(codes.Unimplemented, "method CredentialsRegisterLinkSend not implemented")
 }
-func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponce, error) {
-	return nil, status.Error(codes.Unimplemented, "method Register not implemented")
+func (UnimplementedAuthServiceServer) CredentialsRegisterLinkConfirm(context.Context, *CredentialsRegisterLinkConfirmRequest) (*CredentialsRegisterLinkConfirmResponce, error) {
+	return nil, status.Error(codes.Unimplemented, "method CredentialsRegisterLinkConfirm not implemented")
 }
-func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*LoginResponce, error) {
-	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
+func (UnimplementedAuthServiceServer) CredentialsLogin(context.Context, *CredentialsLoginRequest) (*CredentialsLoginResponce, error) {
+	return nil, status.Error(codes.Unimplemented, "method CredentialsLogin not implemented")
+}
+func (UnimplementedAuthServiceServer) TokenRefresh(context.Context, *TokenRefreshRequest) (*TokenRefreshResponce, error) {
+	return nil, status.Error(codes.Unimplemented, "method TokenRefresh not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -118,56 +134,74 @@ func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
 	s.RegisterService(&AuthService_ServiceDesc, srv)
 }
 
-func _AuthService_SendLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SendLinkRequest)
+func _AuthService_CredentialsRegisterLinkSend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CredentialsRegisterLinkSendRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).SendLink(ctx, in)
+		return srv.(AuthServiceServer).CredentialsRegisterLinkSend(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_SendLink_FullMethodName,
+		FullMethod: AuthService_CredentialsRegisterLinkSend_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).SendLink(ctx, req.(*SendLinkRequest))
+		return srv.(AuthServiceServer).CredentialsRegisterLinkSend(ctx, req.(*CredentialsRegisterLinkSendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterRequest)
+func _AuthService_CredentialsRegisterLinkConfirm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CredentialsRegisterLinkConfirmRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).Register(ctx, in)
+		return srv.(AuthServiceServer).CredentialsRegisterLinkConfirm(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_Register_FullMethodName,
+		FullMethod: AuthService_CredentialsRegisterLinkConfirm_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).Register(ctx, req.(*RegisterRequest))
+		return srv.(AuthServiceServer).CredentialsRegisterLinkConfirm(ctx, req.(*CredentialsRegisterLinkConfirmRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LoginRequest)
+func _AuthService_CredentialsLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CredentialsLoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).Login(ctx, in)
+		return srv.(AuthServiceServer).CredentialsLogin(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_Login_FullMethodName,
+		FullMethod: AuthService_CredentialsLogin_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).Login(ctx, req.(*LoginRequest))
+		return srv.(AuthServiceServer).CredentialsLogin(ctx, req.(*CredentialsLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_TokenRefresh_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TokenRefreshRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).TokenRefresh(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_TokenRefresh_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).TokenRefresh(ctx, req.(*TokenRefreshRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -180,16 +214,20 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SendLink",
-			Handler:    _AuthService_SendLink_Handler,
+			MethodName: "CredentialsRegisterLinkSend",
+			Handler:    _AuthService_CredentialsRegisterLinkSend_Handler,
 		},
 		{
-			MethodName: "Register",
-			Handler:    _AuthService_Register_Handler,
+			MethodName: "CredentialsRegisterLinkConfirm",
+			Handler:    _AuthService_CredentialsRegisterLinkConfirm_Handler,
 		},
 		{
-			MethodName: "Login",
-			Handler:    _AuthService_Login_Handler,
+			MethodName: "CredentialsLogin",
+			Handler:    _AuthService_CredentialsLogin_Handler,
+		},
+		{
+			MethodName: "TokenRefresh",
+			Handler:    _AuthService_TokenRefresh_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
