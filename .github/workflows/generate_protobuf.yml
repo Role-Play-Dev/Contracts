@@ -1,13 +1,12 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Go generate contracts
+name: Go generate protobuf
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - 'v*'
 
 jobs:
   generate_proto_contracts:
@@ -36,8 +35,8 @@ jobs:
     
     - name: Generate proto contracts
       run: | 
-        mkdir -p ./pb
-        protoc -I proto proto/*.proto --go_out=./pb/ --go_opt=paths=source_relative --go-grpc_out=./pb/ --go-grpc_opt=paths=source_relative
+        mkdir -p ./gen/protobuf/
+        protoc -I proto proto/*.proto --go_out=./gen/protobuf/ --go_opt=paths=source_relative --go-grpc_out=./gen/protobuf/ --go-grpc_opt=paths=source_relative
 
     - name: Add deps
       run: go mod tidy
@@ -48,3 +47,7 @@ jobs:
         commit_message: "feat: update contracts [skip ci]"
         commit_user_name: "github-actions[bot]"
         commit_user_email: "github-actions[bot]@users.noreply.github.com"
+
+    - name: Force pkg.go.dev to fetch latest tag
+      run: |
+        curl https://pkg.go.dev/fetch/github.com/${{ github.repository }}@${{ github.ref_name }}
