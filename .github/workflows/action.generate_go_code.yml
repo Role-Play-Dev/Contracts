@@ -11,7 +11,7 @@ on:
 env:
   GENERATE_DIR: './gen/'
   PROTO: 'proto'
-  PROTO_DIR: './${{ env.PROTO }}'
+  PROTO_DIR: './proto'
 
 jobs:
   generate_proto_contracts:
