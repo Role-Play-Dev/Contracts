@@ -5,35 +5,45 @@ package authpb;
 option go_package = "github.com/role-play-dev/contarcts/authpb";
 
 service AuthService {
-    rpc SendLink(SendLinkRequest) returns (SendLinkResponce) {}
-    rpc Register(RegisterRequest) returns (RegisterResponce) {}
-    rpc Login(LoginRequest) returns (LoginResponce) {}
+    rpc CredentialsRegisterLinkSend(CredentialsRegisterLinkSendRequest) returns (CredentialsRegisterLinkSendResponce) {}
+    rpc CredentialsRegisterLinkConfirm(CredentialsRegisterLinkConfirmRequest) returns (CredentialsRegisterLinkConfirmResponce) {}
+    rpc CredentialsLogin(CredentialsLoginRequest) returns (CredentialsLoginResponce) {}
+    rpc TokenRefresh(TokenRefreshRequest) returns (TokenRefreshResponce) {}
 }
 
-message SendLinkRequest {
-    string email = 1;
-    string client_address = 2;
+message CredentialsRegisterLinkSendRequest {
+    string client_address = 1;
+    string email = 2;    
 }
 
-message SendLinkResponce {
+message CredentialsRegisterLinkSendResponce {
 }
 
-message RegisterRequest {
-    string token = 1;
+message CredentialsRegisterLinkConfirmRequest {
+    string auth_token = 1;
     string username = 2;
     string password = 3;
 }
 
-message RegisterResponce {
+message CredentialsRegisterLinkConfirmResponce {
 
 }
 
-message LoginRequest {
+message CredentialsLoginRequest {
     string username = 1;
     string password = 2;
 }
 
-message LoginResponce {
+message CredentialsLoginResponce {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message TokenRefreshRequest {
+    string refresh_token = 1;
+}
+
+message TokenRefreshResponce {
     string access_token = 1;
     string refresh_token = 2;
 }
