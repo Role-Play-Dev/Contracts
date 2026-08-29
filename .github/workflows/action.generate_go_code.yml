@@ -10,7 +10,8 @@ on:
 
 env:
   GENERATE_DIR: './gen/'
-  PROTO_DIR: './proto'
+  PROTO: 'proto'
+  PROTO_DIR: './${{ env.PROTO }}'
 
 jobs:
   generate_proto_contracts:
@@ -34,9 +35,10 @@ jobs:
         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
         
         mkdir -p ${{ env.GENERATE_DIR }}
-        protoc -I proto $(find proto -name "*.proto") \
+        protoc -I ${{ env.PROTO }} -name "auth.proto") \
           --go_out=${{ env.GENERATE_DIR }} --go_opt=paths=source_relative \
-          --go-grpc_out=${{ env.GENERATE_DIR }} --go-grpc_opt=paths=source_relative
+          --go-grpc_out=${{ env.GENERATE_DIR }} --go-grpc_opt=paths=source_relative \
+          ${{ env.PROTO_DIR }}/auth/v1/auth.proto
         
         go mod tidy
 
@@ -46,6 +48,7 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
         git add -f ${{ env.GENERATE_DIR }} go.mod go.sum 2>/dev/null || true
+        git commit -m "chore: update generated contracts [skip ci]" 
 
         CURRENT_TAG="${{ github.ref_name }}"
         VERSION="${CURRENT_TAG#v}"
