@@ -41,6 +41,11 @@ jobs:
     - name: Add deps
       run: go mod tidy
 
+    - name: Configure Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
     - name: Commit generated contracts
       run: |
         git add ./gen/protobuf/ go.mod go.sum
