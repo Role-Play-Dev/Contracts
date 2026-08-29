@@ -42,13 +42,31 @@ jobs:
       run: go mod tidy
 
     - name: Commit generated contracts
-      uses: stefanzweifel/git-auto-commit-action@v5
-      with:
-        branch: main
-        commit_message: "feat: update contracts [skip ci]"
-        commit_user_name: "github-actions[bot]"
-        commit_user_email: "github-actions[bot]@users.noreply.github.com"
-
-    - name: Force pkg.go.dev to fetch latest tag
       run: |
-        curl https://pkg.go.dev/fetch/github.com/${{ github.repository }}@${{ github.ref_name }}
+        git add ./gen/protobuf/ go.mod go.sum
+        git commit -m "feat: update contracts [skip ci]"
+        git push origin main
+
+    - name: Bump version and create new tag
+      run: |
+        CURRENT_TAG="${{ github.ref_name }}"
+        
+        # 1. Убираем префикс 'v'
+        VERSION="${CURRENT_TAG#v}"
+        
+        # 2. Разбиваем версию на части (предполагаем формат X.Y.Z)
+        IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+        PATCH=${PATCH:-0} # На случай, если тег был вида v1.2
+        
+        # 3. Инкрементируем PATCH (последнюю цифру) на 1
+        NEW_PATCH=$((PATCH + 1))
+        NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+
+        echo "Создание нового тега: ${NEW_TAG} на основе ${CURRENT_TAG}"
+        
+        # 4. Создаем аннотированный тег и отправляем его в репозиторий
+        git tag -a "${NEW_TAG}" -m "chore: release ${NEW_TAG} with generated contracts [skip ci]"
+        git push origin "${NEW_TAG}"
+        
+        # 5. Сохраняем новый тег в переменную окружения GitHub для использования в следующих шагах
+        echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
