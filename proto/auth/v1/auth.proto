@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package authpb;
+package auth.v1;
 
-option go_package = "github.com/role-play-dev/contarcts/authpb";
+option go_package = "github.com/role-play-dev/contracts/gen/auth/v1;authv1";
 
 service AuthService {
     rpc CredentialsRegisterLinkSend(CredentialsRegisterLinkSendRequest) returns (CredentialsRegisterLinkSendResponce) {}
