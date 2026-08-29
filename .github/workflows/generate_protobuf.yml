@@ -23,55 +23,44 @@ jobs:
       with:
         go-version: '1.26.5'
 
-    - name: Install protobuff-compiler
-      run: | 
-        sudo apt-get update
-        sudo apt-get install -y protobuf-compiler
-
-    - name: Install protoc-gen-go 
-      run: | 
+    - name: Install tools & Generate
+      run: |
+        sudo apt-get update && sudo apt-get install -y protobuf-compiler
         go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-    
-    - name: Generate proto contracts
-      run: | 
+        
         mkdir -p ./gen/protobuf/
-        protoc -I proto proto/*.proto --go_out=./gen/protobuf/ --go_opt=paths=source_relative --go-grpc_out=./gen/protobuf/ --go-grpc_opt=paths=source_relative
+        protoc -I proto proto/*.proto \
+          --go_out=./gen/protobuf/ --go_opt=paths=source_relative \
+          --go-grpc_out=./gen/protobuf/ --go-grpc_opt=paths=source_relative
+        
+        go mod tidy
 
-    - name: Add deps
-      run: go mod tidy
-
-    - name: Configure Git
+    - name: Commit changes (if any) and bump tag
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Commit generated contracts
-      run: |
-        git add ./gen/protobuf/ go.mod go.sum
-        git commit -m "feat: update contracts [skip ci]"
-        git push origin main
+        # 1. Принудительно добавляем файлы (игнорируя .gitignore)
+        git add -f ./gen/protobuf/ go.mod go.sum 2>/dev/null || true
 
-    - name: Bump version and create new tag
-      run: |
+        # 2. Проверяем, есть ли реальные изменения для коммита
+        if ! git diff-index --quiet HEAD --; then
+          echo "✅ Changes detected. Commit."
+          git commit -m "chore: update generated contracts [skip ci]"
+        else
+          echo "⚠️ No changes"
+        fi
+
+        # 3. Рассчитываем новый тег (инкремент PATCH версии)
         CURRENT_TAG="${{ github.ref_name }}"
-        
-        # 1. Убираем префикс 'v'
         VERSION="${CURRENT_TAG#v}"
-        
-        # 2. Разбиваем версию на части (предполагаем формат X.Y.Z)
         IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-        PATCH=${PATCH:-0} # На случай, если тег был вида v1.2
-        
-        # 3. Инкрементируем PATCH (последнюю цифру) на 1
-        NEW_PATCH=$((PATCH + 1))
-        NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+        PATCH=${PATCH:-0} # Защита, если тег был вида v1.2
+        NEW_TAG="v${MAJOR}.${MINOR}.$((PATCH + 1))"
 
-        echo "Создание нового тега: ${NEW_TAG} на основе ${CURRENT_TAG}"
-        
-        # 4. Создаем аннотированный тег и отправляем его в репозиторий
-        git tag -a "${NEW_TAG}" -m "chore: release ${NEW_TAG} with generated contracts [skip ci]"
+        # 4. Создаем и пушим новый тег. 
+        # Если был коммит, тег укажет на него. Если нет — на текущий коммит.
+        echo "🚀 Создание тега: ${NEW_TAG}"
+        git tag -a "${NEW_TAG}" -m "release ${NEW_TAG} [skip ci]"
         git push origin "${NEW_TAG}"
-        
-        # 5. Сохраняем новый тег в переменную окружения GitHub для использования в следующих шагах
-        echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
