@@ -10,7 +10,7 @@ on:
 
 env:
   GENERATE_DIR: './gen/'
-  PROTO_DIR: 'proto/**/*.proto'
+  PROTO_DIR: './proto'
 
 jobs:
   generate_proto_contracts:
