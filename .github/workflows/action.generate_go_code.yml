@@ -34,9 +34,10 @@ jobs:
         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
         
         mkdir -p ${{ env.GENERATE_DIR }}
-        protoc -I ${{ env.PROTO_DIR }} \
+        protoc -I ${{ env.PROTO_DIR }} $(find ${{ env.PROTO_DIR }} -name "*.proto") \
           --go_out=${{ env.GENERATE_DIR }} --go_opt=paths=source_relative \
-          --go-grpc_out=${{ env.GENERATE_DIR }} --go-grpc_opt=paths=source_relative 
+          --go-grpc_out=${{ env.GENERATE_DIR }} --go-grpc_opt=paths=source_relative \
+          #${{ env.PROTO_DIR }}/**/*.proto
         
         go mod tidy
 
