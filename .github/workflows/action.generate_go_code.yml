@@ -37,7 +37,7 @@ jobs:
         protoc -I ${{ env.PROTO_DIR }} \
           --go_out=${{ env.GENERATE_DIR }} --go_opt=paths=source_relative \
           --go-grpc_out=${{ env.GENERATE_DIR }} --go-grpc_opt=paths=source_relative \
-          $(find ${{ env.PROTO_DIR }} -name "*.proto")
+          ${{ env.PROTO_DIR }}/auth/v1/auth.proto
         
         go mod tidy
 
